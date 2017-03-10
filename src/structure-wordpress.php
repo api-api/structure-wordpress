@@ -14,6 +14,9 @@ if ( ! function_exists( 'apiapi_register_structure_wordpress' ) ) {
 	 * It is stored in a global if the API-API has not yet been loaded.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @param string $name     Unique slug for the site's API structure.
+	 * @param string $base_uri Base URI for accessing the API.
 	 */
 	function apiapi_register_structure_wordpress( $name, $base_uri ) {
 		$structure = new APIAPI\Structure_WordPress\Structure_WordPress( $name, $base_uri );
