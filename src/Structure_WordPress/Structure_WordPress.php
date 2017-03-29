@@ -154,10 +154,28 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 				}
 
 				$route_data = array(
-					'methods' => array(),
+					'primary_params' => array(),
+					'methods'        => array(),
 				);
 
+				$primary_param_names = array();
+				if ( preg_match_all( '@(\/|^)\(\?P\<([A-Za-z_]+)\>\[(.+)\]\+\)@U', $uri, $matches ) ) {
+					for ( $i = 0; $i < count( $matches[2] ); $i++ ) {
+						$primary_param_names[] = $matches[2][ $i ];
+					}
+				}
+
 				foreach ( $data['endpoints'] as $endpoint ) {
+					$endpoint_params = $endpoint['args'];
+
+					if ( ! empty( $primary_param_names ) ) {
+						$new_primary_params = array_intersect_key( $endpoint_params, array_flip( $primary_param_names ) );
+						if ( ! empty( $new_primary_params ) ) {
+							$route_data['primary_params'] = array_merge( $route_data['primary_params'], $new_primary_params );
+							$endpoint_params = array_diff_key( $endpoint_params, $new_primary_params );
+						}
+					}
+
 					foreach ( $endpoint['methods'] as $method ) {
 						$needs_authentication = true;
 						if ( 'GET' === $method && ! in_array( $uri, $uris_which_require_auth, true ) ) {
@@ -165,7 +183,7 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 						}
 
 						$route_data['methods'][ $method ] = array(
-							'params'                 => $endpoint['args'],
+							'params'                 => $endpoint_params,
 							'supports_custom_params' => false,
 							'request_data_type'      => 'raw',
 							'needs_authentication'   => $needs_authentication,
