@@ -94,6 +94,8 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 				}
 
 				$structure_response = array(
+					'title'          => $response->get_param( 'name' ),
+					'description'    => $response->get_param( 'description' ),
 					'namespaces'     => $response->get_param( 'namespaces' ),
 					'authentication' => $response->get_param( 'authentication' ),
 					'routes'         => $response->get_param( 'routes' ),
@@ -119,6 +121,18 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 				if ( is_callable( $this->update_cached_structure_callback ) ) {
 					call_user_func( $this->update_cached_structure_callback, $this->base_uri, $structure_response );
 				}
+			}
+
+			if ( $structure_response['title'] ) {
+				$this->title = $structure_response['title'];
+			} elseif ( strpos( $this->base_uri, 'wordpress.com' ) ) { // WordPress.com works in a special way.
+				$this->title = 'WordPress.com';
+			}
+
+			if ( $structure_response['description'] ) {
+				$this->description = $structure_response['description'];
+			} elseif ( strpos( $this->base_uri, 'wordpress.com' ) ) { // WordPress.com works in a special way.
+				$this->description = 'Blog web hosting service provider.';
 			}
 
 			if ( isset( $structure_response['authentication']['oauth1'] ) ) {
