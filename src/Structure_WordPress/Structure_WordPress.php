@@ -145,8 +145,6 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 				);
 			}
 
-			$uris_which_require_auth = $this->get_uris_which_require_auth();
-
 			foreach ( $structure_response['routes'] as $uri => $data ) {
 				/* Ignore basic namespace discovery endpoints. */
 				if ( '/' === $uri || in_array( ltrim( $uri, '/' ), $structure_response['namespaces'], true ) ) {
