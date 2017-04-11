@@ -178,7 +178,7 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 
 					foreach ( $endpoint['methods'] as $method ) {
 						$needs_authentication = true;
-						if ( 'GET' === $method && ! in_array( $uri, $uris_which_require_auth, true ) ) {
+						if ( 'GET' === $method && 0 === strpos( $uri, '/wp/v2' ) ) {
 							$needs_authentication = false;
 						}
 
@@ -206,18 +206,6 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 		protected function get_default_transporter() {
 			//TODO: This breaks the dependency injection pattern.
 			return apiapi_manager()->transporters()->get_default();
-		}
-
-		/**
-		 * Returns the route URIs which require authentication even on GET requests.
-		 *
-		 * @since 1.0.0
-		 * @access protected
-		 *
-		 * @return array Array of route URIs.
-		 */
-		protected function get_uris_which_require_auth() {
-			return array();
 		}
 	}
 
