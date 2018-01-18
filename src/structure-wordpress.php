@@ -2,7 +2,7 @@
 /**
  * Structure loader.
  *
- * @package APIAPIStructureWordPress
+ * @package APIAPI\Structure_WordPress
  * @since 1.0.0
  */
 

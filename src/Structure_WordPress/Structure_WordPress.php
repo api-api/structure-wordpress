@@ -2,15 +2,17 @@
 /**
  * Structure_WordPress class
  *
- * @package APIAPIStructureWordPress
+ * @package APIAPI\Structure_WordPress
  * @since 1.0.0
  */
 
 namespace APIAPI\Structure_WordPress;
 
 use APIAPI\Core\Structures\Structure;
+use APIAPI\Core\Transporters\Transporter;
 use APIAPI\Core\Request\Request;
 use APIAPI\Core\Request\Response;
+use APIAPI\Core\Request\Method;
 use APIAPI\Core\Exception;
 
 if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
@@ -25,7 +27,6 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 		 * Callback to get a cached structure response.
 		 *
 		 * @since 1.0.0
-		 * @access protected
 		 * @var callable|null
 		 */
 		protected $get_cached_structure_callback = null;
@@ -34,7 +35,6 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 		 * Callback to update the structure response in cache.
 		 *
 		 * @since 1.0.0
-		 * @access protected
 		 * @var callable|null
 		 */
 		protected $update_cached_structure_callback = null;
@@ -43,7 +43,6 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 		 * Constructor.
 		 *
 		 * @since 1.0.0
-		 * @access public
 		 *
 		 * @param string $name     Slug of the instance.
 		 * @param string $base_uri Base URI to the website's API.
@@ -59,7 +58,7 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 		 *                                                      Default null.
 		 * }
 		 */
-		public function __construct( $name, $base_uri, $args = array() ) {
+		public function __construct( $name, $base_uri, array $args = array() ) {
 			$this->base_uri = $base_uri;
 
 			foreach ( $args as $key => $value ) {
@@ -79,14 +78,15 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 		 * class and default authentication data.
 		 *
 		 * @since 1.0.0
-		 * @access protected
+		 *
+		 * @throws Exception Thrown when the discovery API response is invalid.
 		 */
 		protected function setup() {
 			$structure_response = is_callable( $this->get_cached_structure_callback ) ? call_user_func( $this->get_cached_structure_callback, $this->base_uri ) : false;
 			if ( ! is_array( $structure_response ) ) {
 				$transporter = $this->get_default_transporter();
 
-				$request = new Request( $this->base_uri, 'GET' );
+				$request = new Request( $this->base_uri, Method::GET );
 				$response = new Response( $transporter->send_request( $request ) );
 
 				if ( null === $response->get_param( 'routes' ) ) {
@@ -176,7 +176,7 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 
 					foreach ( $endpoint['methods'] as $method ) {
 						$needs_authentication = true;
-						if ( 'GET' === $method && 0 === strpos( $uri, '/wp/v2' ) ) {
+						if ( Method::GET === $method && 0 === strpos( $uri, '/wp/v2' ) ) {
 							$needs_authentication = false;
 						}
 
@@ -197,9 +197,8 @@ if ( ! class_exists( 'APIAPI\Structure_WordPress\Structure_WordPress' ) ) {
 		 * Gets the default transporter object.
 		 *
 		 * @since 1.0.0
-		 * @access protected
 		 *
-		 * @return APIAPI\Core\Transporters\Transporter Default transporter object.
+		 * @return Transporter Default transporter object.
 		 */
 		protected function get_default_transporter() {
 			//TODO: This breaks the dependency injection pattern.
